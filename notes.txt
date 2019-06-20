@@ -1,0 +1,49 @@
+containers with a network
+
+front end with upload
+goal for virus is to propagate, extract a file, and send it to an ip.
+
+level selector,
+level will spin up machines and network
+
+
+webui:(flask)
+ start container setup
+ upload to container (only 1 exposed to host) (pyinstaller)
+ issue get to webui/api with file contents
+
+ agent logging ps, netstat, forwarding syslog to webui
+ 
+ 
+----
+agent.py:
+open socket to host(hardcoded ip)
+send netstat, ifconfig, 
+loop:
+	send syslog
+	send ps data
+----
+payload.py: 
+send file(pre-given filename) over tcp
+
+---
+server.py
+ listen on port
+ receive syslog->add to dynamic list of connected hosts
+ receive ps
+
+javascript: generate tabs, based on pushing of data, and remembering state
+ display pc-color(blue/red), click will focus on tab. (push data with websocket)
+ display ps/netstat/ifconfig data (side-view), update dynamic (push data with websocket)
+ display syslog-data (on console tab) (push data with websocket)
+
+
+$(document).ready(function() {
+
+$("#closabletab1").dynatabs({
+tabBodyID : "closabletabbody1",
+showCloseBtn: true
+});
+});
+</script>
+

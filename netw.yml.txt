@@ -1,0 +1,22 @@
+version: "3"
+services:
+
+  proxy:
+    build: ./proxy
+    networks:
+      - network2
+      - network1
+
+  app:
+    build: ./app
+    networks:
+      - network1
+
+networks:
+  network1:
+    driver: overlay
+    internal: true
+  network2:
+    driver: custom-driver-2
+
+https://forums.docker.com/t/internal-network-between-containers-without-external-network-access/41751/8
