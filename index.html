@@ -4,127 +4,14 @@
 <title>Intruder</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="layout.css" rel="stylesheet" type="text/css"></link>
-<link href="vis.min.css" rel="stylesheet" type="text/css" />
+<link href="css/vis.min.css" rel="stylesheet" type="text/css" />
+<link href="css/layout.css" rel="stylesheet" type="text/css"></link>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script type="text/javascript" src="socket.io.min.js"></script>
-<script type="text/javascript" src="tdi.tabs.js"></script>
-<script type="text/javascript" src="vis.min.js"></script>
-<script type="text/javascript">
-  var nodes, edges, network;
-	
-	$(document).ready(function() {
-		//add tabs
-		$("#hostlogtab").dynatabs({
-			tabBodyID : "hostlogbody",
-			showCloseBtn : true,
-		});
+<script type="text/javascript" src="lib/socket.io.min.js"></script>
+<script type="text/javascript" src="lib/tdi.tabs.js"></script>
+<script type="text/javascript" src="lib/vis.min.js"></script>
 
-    /*$('#stopStreamButtonID').click(function(event) {        
-	    socket.emit('stopStreamButtonID', {data: ''});
-    });
-
-	  namespace = '';
-
-    var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'Connected to server'});
-    });
-
-    socket.on('serverUpdate', function(msg) {
-	    //console.log(msg);
-	    setStatus(msg);				
-    });
-    socket.on('lastTrialDiv', function(msg) {
-	    console.log('lastTrialDiv received')
-	    plotSpinner(0);
-	    $('#lastTrialPlotID').html(msg.plotDiv);				
-    });
-    socket.on('refreshvideostream', function(msg) {
-	    console.log('refreshvideostream received')
-	    setStatus(msg);				
-	    window.location.reload()
-    });*/
-	});
-	
-	function addNewhostinfoTab()
-	{
-		$.addDynaTab({
-			tabID : 'hostinfotab',
-			type : 'ajax',
-			url : 'ajaxcontent.html',
-			method : 'get',
-			dtype : 'html',
-			params : {},
-			tabTitle : 'New Ajax Tab'
-		});
-	}
-
-  // convenience method to stringify a JSON object
-  function toJSON(obj) {
-      return JSON.stringify(obj, null, 4);
-  }
-
-  function addNode() {
-      try {
-          nodes.add({
-              id: '4',
-              label: 'PC4',
-              image: 'Hardware-My-Computer-3-icon.png', shape: 'image'
-          });
-      }
-      catch (err) {
-          alert(err);
-      }
-  }
-
-  function addEdge() {
-      try {
-          edges.add({
-              id: '3',
-              from: '2',
-              to: '4'
-          });
-      }
-      catch (err) {
-          alert(err);
-      }
-  }
-
-  function draw() {
-      // create an array with nodes
-      nodes = new vis.DataSet();
-      nodes.add([
-          {id: '1', label: 'Node 1', image: 'pc.png', shape: 'image', font: '12px Arial white'},
-          {id: '2', label: 'Node 2', image: 'pc.png', shape: 'image', font: '12px Arial white'},
-          {id: '3', label: 'Node 3', image: 'pc.png', shape: 'image', font: '12px Arial white'},
-      ]);
-
-      // create an array with edges
-      edges = new vis.DataSet();
-      edges.add([
-          {id: '1', from: '1', to: '2'},
-          {id: '2', from: '1', to: '3'},
-      ]);
-
-      // create a network
-      var container = document.getElementById('network');
-      var data = {
-          nodes: nodes,
-          edges: edges
-      };
-      var options = {};
-      network = new vis.Network(container, data, options);
-
-      network.on("click", function (params) {
-          params.event = "[original event]";
-          alert('Click event:' + JSON.stringify(params, null, 4));
-          console.log('click event, getNodeAt returns: ' + this.getNodeAt(params.pointer.DOM));
-      });
-  }
-
-	</script>
-
+<script type="text/javascript" src="client.js"></script>
 
 </head>
 <body onload="draw()">
@@ -148,7 +35,7 @@
   <div class="column rightside" id="hostinfo">
     <h2>Hostinfo</h2>		
 		<h3>ps</h3>
-<pre>UID        PID  PPID  C STIME TTY          TIME CMD
+<pre id="ps">UID        PID  PPID  C STIME TTY          TIME CMD
 root         1     0  0 20:03 ?        00:00:03 /sbin/init
 root         2     0  0 20:03 ?        00:00:00 [kthreadd]
 root         4     2  0 20:03 ?        00:00:00 [kworker/0:0H]
@@ -168,7 +55,7 @@ root        19     2  0 20:03 ?        00:00:00 [cpuhp/2]
 root        20     2  0 20:03 ?        00:00:00 [watchdog/2]
 </pre>
 		<h3>syslog</h3>
-<pre>Jun 20 22:18:44 WOPR-PC org.freedesktop.thumbnails.Thumbnailer1[2050]: Registered thumbailer gnome-thumbnail-font --size %s %u %o
+<pre id="syslog">Jun 20 22:18:44 WOPR-PC org.freedesktop.thumbnails.Thumbnailer1[2050]: Registered thumbailer gnome-thumbnail-font --size %s %u %o
 Jun 20 22:18:44 WOPR-PC org.freedesktop.thumbnails.Thumbnailer1[2050]: Registered thumbailer /usr/bin/gdk-pixbuf-thumbnailer -s %s %u %o
 Jun 20 22:18:44 WOPR-PC org.freedesktop.thumbnails.Thumbnailer1[2050]: Registered thumbailer atril-thumbnailer -s %s %u %o
 Jun 20 22:18:44 WOPR-PC org.freedesktop.thumbnails.Thumbnailer1[2050]: Registered thumbailer /usr/bin/gdk-pixbuf-thumbnailer -s %s %u %o
@@ -180,7 +67,7 @@ Jun 20 22:22:49 WOPR-PC dbus-daemon[2050]: [session uid=1000 pid=2050] Successfu
 Jun 20 22:22:49 WOPR-PC systemd[1999]: Started GNOME Terminal Server.
 </pre>
 		<h3>netstat</h3>
-<pre>Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+<pre id="netstat">Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
 tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
 tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      -                   
 tcp        0      0 192.168.192.21:48978    50.112.34.20:443        ESTABLISHED 3508/firefox        
@@ -223,15 +110,6 @@ Jun 20 22:22:49 WOPR-PC systemd[1999]: Started GNOME Terminal Server.
 			<li><a data-toggle="tab" href="#logtab1">Host1</a></li>
 			<li><a data-toggle="tab" href="#logtab2">192.168.1.10</a></li>
 			<li><a data-toggle="tab" href="#logtab3">hacker.com</a></li>
-			<!--<li><a data-toggle="tab" href="#logtab1">Host1</a></li>
-			<li><a data-toggle="tab" href="#logtab2">192.168.1.10</a></li>
-			<li><a data-toggle="tab" href="#logtab3">hacker.com</a></li>
-			<li><a data-toggle="tab" href="#logtab1">Host1</a></li>
-			<li><a data-toggle="tab" href="#logtab2">192.168.1.10</a></li>
-			<li><a data-toggle="tab" href="#logtab3">hacker.com</a></li>
-			<li><a data-toggle="tab" href="#logtab1">Host1</a></li>
-			<li><a data-toggle="tab" href="#logtab2">192.168.1.10</a></li>
-			<li><a data-toggle="tab" href="#logtab3">hacker.com</a></li> -->
 		</ul>
 		<!-- Tab Headers End --> 
 	</div>
