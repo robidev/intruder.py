@@ -34,18 +34,16 @@ $(document).ready(function() {
   });*/
 });
 
-function addNewhostinfoTab()
-{
-	$.addDynaTab({
-		tabID : 'hostinfotab',
-		type : 'ajax',
-		url : 'ajaxcontent.html',
-		method : 'get',
-		dtype : 'html',
-		params : {},
-		tabTitle : 'New Ajax Tab'
-	});
-}
+function addNewStaticTab()
+	{
+		$.addDynaTab({
+			tabID : 'hostlogtab',
+			type : 'html',
+			html : '<p>This HTML content is loaded statically</p>',
+			params : {},
+			tabTitle : 'google.com'
+		});
+	}
 
 // convenience method to stringify a JSON object
 function toJSON(obj) {
@@ -54,10 +52,18 @@ function toJSON(obj) {
 
 function addNode() {
     try {
-        nodes.add({
-            id: '4',
-            label: 'PC4',
-            image: 'img/pc.png', shape: 'image'
+        nodes.add({ id: '4', label: 'PC4', image: 'img/pc.png', shape: 'image', font: '12px Arial white'});
+    }
+    catch (err) {
+        alert(err);
+    }
+}
+
+function updateNode() {
+    try {
+        nodes.update({
+            id: '1',
+            image: 'img/pc2.png'
         });
     }
     catch (err) {
@@ -67,11 +73,7 @@ function addNode() {
 
 function addEdge() {
     try {
-        edges.add({
-            id: '3',
-            from: '2',
-            to: '4'
-        });
+        edges.add({ id: '3', from: '2', to: '4'});
     }
     catch (err) {
         alert(err);
@@ -108,4 +110,26 @@ function draw() {
         //alert('Click event:' + JSON.stringify(params, null, 4));
         console.log('click event, getNodeAt returns: ' + this.getNodeAt(params.pointer.DOM));
     });
+}
+
+function add_host() {
+
+  addNewStaticTab();
+  var tab = $('#hostlogtab.tabs');
+
+  var len = $('#hostlogtab.tabs')[0].children.length;
+  var href = $('#hostlogtab.tabs')[0].children[len-1].children[0];
+  var event = $.Event("click");
+  event.data = {ahref:"",tab:""};
+  event.data.ahref = href;
+  event.data.tab = tab;
+  $("#hostlogtab").showTab(event);
+
+  $('#ps')[0].innerHTML = "";
+  $('#syslog')[0].innerHTML = "";
+  $('#netstat')[0].innerHTML = "";
+
+  addNode();
+  addEdge();
+  updateNode();
 }
