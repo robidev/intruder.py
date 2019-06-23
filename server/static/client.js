@@ -27,11 +27,12 @@ $(document).ready(function() {
     //if host is not known, add the host
   });
 
-  socket.on('select_tab_event', function (host_index) {
+  socket.on('select_tab_event', function (data) {
     //event gets called from server when the tab-focus should be changed
+    var integer = parseInt(data['host_index'], 10);
     var tab = $('#hostlogtab.tabs');
     var len = $('#hostlogtab.tabs')[0].children.length;
-    var href = $('#hostlogtab.tabs')[0].children[host_index].children[0];
+    var href = $('#hostlogtab.tabs')[0].children[integer].children[0];
     var event = $.Event("click");
     event.data = {ahref:"",tab:""};
     event.data.ahref = href;
@@ -46,7 +47,7 @@ $(document).ready(function() {
     addNewStaticTab();
   });
 
-  socket.on('update_hosts_event', function (hosts, apearance) {
+  socket.on('update_hosts_event', function (hosts, edges, apearance) {
     //event gets called from server when the host apearance should be updated in the vis.js diagram
     updateNode();
   });
@@ -155,17 +156,17 @@ function get_hosts() {
   //call server to tell we want current list of hosts
 }
 
-function get_logging_data(host) {
+function get_logging_data() {
   socket.emit('get_logging_data', {data: ''});
   //call server to tell we want last (100) loglines from 'host'
 }
 
-function get_info_data(host) {
+function get_info_data() {
   socket.emit('get_info_data', {data: ''});
   //call server to tell we want updated info tab from 'host'
 }
 
-function set_focus(host) {
+function set_focus() {
   socket.emit('set_focus', {data: ''});
   //call server to tell we want to change focus, to receive updated info from 'host'
 }
