@@ -39,10 +39,10 @@ $(document).ready(function() {
     var ahref = $("#" + data['host'] + "_tab")[0];
     var key = $(ahref).attr('href');
     if(data['clear'] == '1') {
-      $(key)[0].innerHTML = data['data'];  
+      $(key)[0].innerHTML = "<pre>" + data['data'] + "</pre>";  
     }
     else {
-      $(key)[0].innerHTML += data['data'];
+      $(key)[0].innerHTML += "<pre>" + data['data'] + "</pre>";
     }
     //$(key).id = "ggg";
     //href.attr('href').show()
@@ -143,7 +143,7 @@ function addNewStaticTab(host)
   $.addDynaTab({
     tabID : 'hostlogtab',
     type : 'html',
-    html : 'empty',
+    html : '...',
     tabTitle : host
   });
 
