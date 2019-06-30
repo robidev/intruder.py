@@ -31,6 +31,11 @@ $(document).ready(function() {
     //event gets called from server when new log events are generated, and add them to the log tab
     //if clear is set, all log data is cleared before adding the new data
     //TODO if host is not known, add the host
+    if($("#" + data['host'] + "_tab").length == 0) {
+      addNode(data['host'], '1');
+      addNewStaticTab(data['host']);
+    }
+
     var ahref = $("#" + data['host'] + "_tab")[0];
     var key = $(ahref).attr('href');
     if(data['clear'] == '1') {
@@ -114,12 +119,12 @@ function get_logging_data() {
 }
 
 function get_info_data() {
-  socket.emit('get_info_data', {data: ''});
+  socket.emit('get_info_data', 'localhost');
   //call server to tell we want updated info tab from 'host'
 }
 
 function set_focus() {
-  socket.emit('set_focus', {data: ''});
+  socket.emit('set_focus', 'localhost');
   //call server to tell we want to change focus, to receive updated info from 'host'
 }
 
@@ -130,7 +135,8 @@ function set_focus() {
 function addNewStaticTab(host)
 {
   var ret = 0;
-  if($("#" + host + "_tab").length) {
+  if($("#" + host + "_tab").length > 0) {
+    console.log("tab exists");
     return 1;//tab exists
   }
 
@@ -148,7 +154,7 @@ function addNewStaticTab(host)
     ahref.id = host + "_tab";
   }
   catch (err) {
-    alert(err);
+    console.log(err);
     ret = -1;
   }
   return ret;
@@ -165,7 +171,7 @@ function selectTabByHref(tab, ahref)
     $("#hostlogtab").showTab(event);
   }
   catch (err) {
-    alert(err);
+    console.log(err);
     ret = -1;
   }
   return ret;
@@ -185,8 +191,8 @@ function addNode(host, appearance) {
       nodes.add({ id: host + "_node", label: host, image: img, shape: 'image', font: '12px Arial white'});
   }
   catch (err) {
-      alert(err);
-      ret = -1;
+    console.log(err);
+    ret = -1;
   }
   return ret;
 }
@@ -207,8 +213,8 @@ function updateNode(host, appearance) {
       });
   }
   catch (err) {
-      alert(err);
-      ret = -1;
+    console.log(err);
+    ret = -1;
   }
   return ret;
 }
@@ -219,8 +225,8 @@ function addEdge(id, from, to) {
       edges.add({ id: id + "_edge", from: from + "_node", to: to + "_node"});
   }
   catch (err) {
-      alert(err);
-      ret = -1;
+    console.log(err);
+    ret = -1;
   }
   return ret;
 }
@@ -231,7 +237,7 @@ function removeNode(host) {
       nodes.remove({id: host + "_node"});
   }
   catch (err) {
-    alert(err);
+    console.log(err);
     ret = -1;
   }
   return ret;
@@ -243,7 +249,7 @@ function removeEdge(id) {
       edges.remove({id: id + "_edge"});
   }
   catch (err) {
-    alert(err);
+    console.log(err);
     ret = -1;
   }
   return ret;
@@ -265,11 +271,16 @@ function draw() {
   var options = {};
   network = new vis.Network(container, data, options);
 
-  /*network.on("click", function (params) {
+  network.on("click", function (params) {
       params.event = "[original event]";
-      //alert('Click event:' + JSON.stringify(params, null, 4));
-      //console.log('click event, getNodeAt returns: ' + this.getNodeAt(params.pointer.DOM));
-  });*/
+      if(params.nodes.length > 0) {
+        host_node = params.nodes[0];
+        host = host_node.slice(0,-5);
+        socket.emit('get_info_data', host);
+        socket.emit('set_focus', host);
+      }
+      console.log('click event, getNodeAt returns: ' + this.getNodeAt(params.pointer.DOM));
+  });
 }
 
 

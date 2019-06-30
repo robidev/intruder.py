@@ -9,7 +9,7 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 socketio = SocketIO(app, async_mode=async_mode)
 
 
-def emit_infoevent():
+def emit_infoevent(data):
     emit('info_event', {'type': '0', 'data': 'UID        PID  PPID  C STIME TTY          TIME CMD \n\
 root         1     0  0 20:03 ?        00:00:03 /sbin/init \n\
 root         2     0  0 20:03 ?        00:00:00 [kthreadd] \n\
@@ -46,7 +46,7 @@ tcp        0      0 192.168.192.21:43818    216.58.208.106:80       TIME_WAIT   
 tcp        0      0 192.168.192.21:43820    216.58.208.106:80       ESTABLISHED 3508/firefox        \n\
 tcp6       0      0 ::1:631                 :::*                    LISTEN      -   '})
 
-def emit_logevent():
+def emit_logevent(data):
     emit('log_event', {'host': 'a', 'data': '<pre><font color="#00FF00"><b>Host1</b></font>:<font color="#5C5CFF"><b>~</b></font>$ tail /var/log/syslog\n\
 Jun 20 22:18:44 WOPR-PC dbus-daemon[2050]: [session uid=1000 pid=2050] Successfully activated service &apos;org.freedesktop.thumbnails.Thumbnailer1&apos;\n\
 Jun 20 22:22:49 WOPR-PC dbus-daemon[2050]: [session uid=1000 pid=2050] Activating via systemd: service name=&apos;org.gnome.Terminal&apos; \n\
@@ -103,17 +103,17 @@ def get_page_data(data):
 @socketio.on('get_logging_data', namespace='')
 def get_page_data(data):
     print "get_logging_data"
-    emit_logevent()
+    emit_logevent(data)
 
 @socketio.on('get_info_data', namespace='')
 def get_page_data(data):
     print "get_info_data"
-    emit_infoevent()
+    emit_infoevent(data)
 
 @socketio.on('set_focus', namespace='')
 def get_page_data(data):
     print "set_focus"
-    emit_selecttabevent_byindex('0')    #emit_selecttabevent_byname('localhost')
+    emit_selecttabevent_byname(data)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

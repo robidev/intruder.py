@@ -27,6 +27,24 @@
   background: #1d272f;
 }
 
+h2.teal {
+  color: #26343e;
+  background-color: #00b9a0;
+}
+h2.magenta {
+  color: #26343e;
+  background-color: #FF00FF;
+}
+
+h2 {
+  margin: 0px;
+  padding-left: 10px;
+  line-height: 36px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
 body {
   margin: 0;
   font: 12px/1.5 Arial, Helvetica, sans-serif;
@@ -38,8 +56,6 @@ body {
 
 .wrap {
   width: auto;
-  padding-left: 20px;
-  padding-right: 20px;
 
   display: grid;
   grid-template-columns: 250px 600px auto;
@@ -51,7 +67,7 @@ body {
 .column {
   /*float: left;*/
   display: grid;
-  padding: 10px;
+
   border: 1px solid #00b9a0;
   margin-top: 20px;
   margin-bottom: 20px;
@@ -61,12 +77,14 @@ body {
 
 /* Left column */
 .column.leftside {
+  border: 1px solid #FF00FF;
   display: inline;
   grid-column: 1;
 }
 
 /* Middle column */
 .column.middle {
+  display: inline;
   grid-column: 2;
 }
 
@@ -78,10 +96,14 @@ body {
   overflow: auto;
 }
 
+.content {
+  padding: 10px;
+}
+
 /* Style the footer */
 .footer {
   text-align: left;
-  border: 1px solid #00b9a0;
+  border: 1px solid #ff00ff;
   margin-bottom: 20px;
   margin-left: 10px;
   margin-right: 10px;
