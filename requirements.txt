@@ -1,0 +1,8 @@
+python
+redis
+docker
+docker-compose
+
+python:
+flask
+socketio

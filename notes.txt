@@ -38,12 +38,4 @@ javascript: generate tabs, based on pushing of data, and remembering state
  display syslog-data (on console tab) (push data with websocket)
 
 
-$(document).ready(function() {
-
-$("#closabletab1").dynatabs({
-tabBodyID : "closabletabbody1",
-showCloseBtn: true
-});
-});
-</script>
 
