@@ -102,5 +102,5 @@ def test_connect():
     thread = socketio.start_background_task(target=worker)
 
 if __name__ == '__main__':
-  socketio.run(app)
+  socketio.run(app, debug=True)
 

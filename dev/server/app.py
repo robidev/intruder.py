@@ -70,7 +70,8 @@ def get_page_data5(data):
 def worker():
   global focus
   socketio.sleep(tick)
-  UDP_IP = "172.16.0.1"
+  UDP_IP = "0.0.0.0"
+#  UDP_IP = "172.16.0.1"
 #  UDP_IP = "192.168.192.21"
 #  UDP_IP = "127.0.0.1"
   UDP_PORT = 10514

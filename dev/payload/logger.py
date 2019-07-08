@@ -4,7 +4,7 @@ import json
 import time
 from subprocess import PIPE
 
-h='172.16.0.1'
+h='gamemaster'
 #h='127.0.0.1'
 #h='192.168.192.21'
 
@@ -19,7 +19,7 @@ logfile=open("/tmp/tst",'r')
 line=''
 while True:
   
-  e = ""#info ps
+  e = time.strftime("last updated:\t%d %b %Y %H:%M:%S\n---\nuser\tPID\tname\tCMD\n", time.gmtime())
   for proc in psutil.process_iter(attrs=['username','pid','name','cmdline']):
     d="%s\t%s\t%s\t%s\n"%(proc.info['username'],proc.info['pid'],proc.info['name'],proc.info['cmdline'])
     e+=d
@@ -50,8 +50,8 @@ while True:
     if b == 'lo':
       continue
     if b in t:
-      e= "%s %s %s %s" % (b,c[0].address,c[0].netmask,t[b].isup)
-  f={'event':'info_event', 'data':{'host':hs,'type':'1','data':e}}
+      e= "if=%s ip=%s subnet=%s status=%s" % (b,c[0].address,c[0].netmask,t[b].isup)
+  f={'event':'info_event', 'data':{'host':hs,'type':'3','data':e}}
   s.sendto(str.encode(json.dumps(f)),(h,p))
 
   #forward all log-lines

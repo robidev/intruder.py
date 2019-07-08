@@ -25,12 +25,14 @@ $(document).ready(function() {
     if(tp == '2'){
         $('#netstat')[0].innerHTML = data['data'];
     }
+    if(tp == '3'){
+        $('#ifconfig')[0].innerHTML = data['data'];
+    }
   });
 
   socket.on('log_event', function (data) {
     //event gets called from server when new log events are generated, and add them to the log tab
     //if clear is set, all log data is cleared before adding the new data
-    //TODO if host is not known, add the host
     if($("#" + data['host'] + "_tab").length == 0) {
       addNode(data['host'], '1');
       addNewStaticTab(data['host']);
@@ -44,8 +46,9 @@ $(document).ready(function() {
     else {
       $(key)[0].innerHTML += "<pre>" + data['data'] + "</pre>";
     }
-    //$(key).id = "ggg";
-    //href.attr('href').show()
+    //scroll to bottom
+    var element = $("#hostlogbody")[0];
+    element.scrollTop = element.scrollHeight;
   });
 
   socket.on('select_tab_event', function (data) {
