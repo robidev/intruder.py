@@ -1,17 +1,11 @@
-front end with upload
 goal for virus is to propagate, extract a file, and send it to an ip.
 
-level selector,
-level will spin up machines and network
-
+TODO level selector, will spin up machines and network
 
 webui:(flask)
- start container setup
- upload to container (only 1 exposed to host) (pyinstaller)
- issue get to webui/api with file contents
-
- agent logging ps, netstat, forwarding syslog to webui
- 
- 
-javascript: generate tabs, based on pushing of data, and remembering state
- display pc-color(blue/red)
+ TODO upload to container (only 1 exposed to host) (pyinstaller)
+ TODO issue get to webui/api with file contents
+  
+javascript: generate tabs, based on pushing of data, TODO remembering state
+ TODO display pc-color(blue/red) based on log-message
+ TODO add lines based on connections(subnet/netstat/scan?)
