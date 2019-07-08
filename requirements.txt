@@ -1,8 +1,13 @@
-python
-redis
-docker
-docker-compose
+server
+  docker-compose
 
-python:
-flask
-socketio
+gamemaster
+  python3
+  python:
+  flask
+  flask-socketio
+
+client
+  python3
+  python:
+    psutil

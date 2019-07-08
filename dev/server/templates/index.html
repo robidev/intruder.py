@@ -7,6 +7,11 @@
 <link href="static/css/vis.min.css" rel="stylesheet" type="text/css" />
 <link href="static/css/layout.css" rel="stylesheet" type="text/css"></link>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+if (typeof jQuery == 'undefined') {
+    document.write(unescape("%3Cscript type='text/javascript' src='static/lib/jquery.min.js'%3E%3C/script%3E"));
+}
+</script>
 <script type="text/javascript" src="static/lib/socket.io.js"></script>
 <script type="text/javascript" src="static/lib/tdi.tabs.js"></script>
 <script type="text/javascript" src="static/lib/vis.min.js"></script>
