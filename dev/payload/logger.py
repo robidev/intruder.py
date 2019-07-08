@@ -50,7 +50,7 @@ while True:
     if b == 'lo':
       continue
     if b in t:
-      e= "if=%s ip=%s subnet=%s status=%s" % (b,c[0].address,c[0].netmask,t[b].isup)
+      e+= "if=%s ip=%s subnet=%s status=%s\n" % (b,c[0].address,c[0].netmask,t[b].isup)
   f={'event':'info_event', 'data':{'host':hs,'type':'3','data':e}}
   s.sendto(str.encode(json.dumps(f)),(h,p))
 
