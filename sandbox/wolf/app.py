@@ -84,7 +84,6 @@ def worker():
     try:
       data, addr = sock.recvfrom(65356) # buffer size is 1024 bytes
       if data:
-        #print("received message:%s" % data )
         loaded_json = json.loads(data)
         if loaded_json['event']=='info_event':
           if loaded_json['data']['host']==focus:

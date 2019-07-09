@@ -1,17 +1,5 @@
 version: '3.7'
 services:
-  gamemaster:
-    image: localhost:5000/sandbox_gamemaster:latest
-    build:
-      context: .
-      dockerfile: Dockerfile.wolf
-    networks:
-      - network1
-      - network2
-    hostname: gamemaster
-    ports:
-      - "5000:5000"
-
   sheep1:
     image: localhost:5000/sandbox_sheep1:latest
     build:
@@ -40,16 +28,20 @@ services:
       - network2
     hostname: sheep3
 
+  gamemaster:
+    image: localhost:5000/sandbox_forwarder:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.forwarder
+    networks:
+      - network2
+      - network1
+      - network_master
+
 networks:
   network1:
-    driver: bridge
-    ipam:
-      driver: default
+    internal: true
   network2:
     internal: true
-#      config:
-#        - subnet: "172.16.0.0/24"
-#    driver: overlay
-#    internal: true
-#    driver: custom-driver-2
-#https://forums.docker.com/t/internal-network-between-containers-without-external-network-access/41751/8
+  network_master:
+    external: true

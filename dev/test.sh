@@ -9,7 +9,7 @@ echo -e "\e[32m[+] stopping any running container\e[0m"
 docker-compose down
 
 echo -e "\e[32m[+] copying files to sandbox\e[0m"
-if ! cp -a ../dev/server/* gamemaster/; then
+if ! cp -a ../dev/server/* wolf/; then
   echo -e "\e[31m[-] copying server files to sandbox failed\e[0m"
   exit 1
 fi

@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  wolf:
+    image: localhost:5000/sandbox_wolf:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.wolf
+    networks:
+      - network_master
+    hostname: wolf
+    ports:
+      - "5000:5000"
+
+networks:
+  network_master:
+    driver: bridge
+    external: false
+    name: network_master
+    
