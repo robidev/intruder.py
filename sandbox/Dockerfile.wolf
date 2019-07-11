@@ -2,8 +2,9 @@ FROM python:3.7-alpine
 WORKDIR /code
 ENV FLASK_APP app.py
 ENV FLASK_RUN_HOST 0.0.0.0
-RUN apk add --no-cache gcc musl-dev linux-headers
+RUN apk add --no-cache --virtual .pynacl_deps make gcc linux-headers python3-dev musl-dev libffi-dev openssl-dev libsodium-dev
 COPY wolf/requirements.txt requirements.txt
 RUN pip install -r requirements.txt
+RUN apk del .pynacl_deps
 COPY ./wolf .
 CMD ["flask", "run"]

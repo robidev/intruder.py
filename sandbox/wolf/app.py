@@ -5,8 +5,9 @@ from flask_socketio import SocketIO, emit
 
 import socket
 import json
+import compose
 
-import webbrowser
+#import webbrowser
 
 thread = None
 tick = 0.001

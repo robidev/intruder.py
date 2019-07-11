@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   sheep1:
-    image: localhost:5000/sandbox_sheep1:latest
+    image: sandbox_sheep1:latest
     build:
       context: .
       dockerfile: Dockerfile.sheep
@@ -10,7 +10,7 @@ services:
     hostname: sheep1
 
   sheep2:
-    image: localhost:5000/sandbox_sheep1:latest
+    image: sandbox_sheep1:latest
     build:
       context: .
       dockerfile: Dockerfile.sheep
@@ -20,7 +20,7 @@ services:
     hostname: sheep2
 
   sheep3:
-    image: localhost:5000/sandbox_sheep1:latest
+    image: sandbox_sheep1:latest
     build:
       context: .
       dockerfile: Dockerfile.sheep
@@ -29,7 +29,7 @@ services:
     hostname: sheep3
 
   gamemaster:
-    image: localhost:5000/sandbox_forwarder:latest
+    image: sandbox_forwarder:latest
     build:
       context: .
       dockerfile: Dockerfile.forwarder

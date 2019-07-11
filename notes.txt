@@ -9,3 +9,12 @@ webui:(flask)
 javascript: generate tabs, based on pushing of data, TODO remembering state
  TODO display pc-color(blue/red) based on log-message
  TODO add lines based on connections(subnet/netstat/scan?)
+
+install:(windows/mac/linux)
+
+  prerequisite:
+  install docker
+
+  bootstrap:
+  start.sh: docker run -v /var/run/docker.sock:/var/run/docker.sock
+  start.bat: -v //./pipe/docker_engine://./pipe/docker_engine
