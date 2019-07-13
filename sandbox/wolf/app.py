@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #sanic???
 from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO, emit
@@ -6,8 +6,7 @@ from flask_socketio import SocketIO, emit
 import socket
 import json
 import compose
-
-#import webbrowser
+import subprocess
 
 thread = None
 tick = 0.001
@@ -48,22 +47,37 @@ def index():
 def get_page_data(data):
   print("get_page_data")
 
-@socketio.on('get_hosts', namespace='')
-def get_page_data2(data):
-  print("get_host")
+@socketio.on('start_level', namespace='')
+def start_level(data):
+  print("starting level")
+  ret = subprocess.check_output(['docker-compose', '-f', '/levels/docker-compose.sheep.yml', 'up', '-d'])
+  print(ret)
 
-@socketio.on('get_logging_data', namespace='')
-def get_page_data3(data):
-  print("get_logging_data")
+@socketio.on('stop_level', namespace='')
+def stop_level(data):
+  print("stopping level")
+  ret = subprocess.check_output(['docker-compose', '-f', '/levels/docker-compose.sheep.yml', 'down'])
+  print(ret)
 
-@socketio.on('get_info_data', namespace='')
-def get_page_data4(data):
-  print("get_info_data")
+@socketio.on('reset_level', namespace='')
+def reset_level(data):
+  print("resetting level")
+  stop_level(data)
+  get_page_data(data)
+  start_level(data)
+
+@socketio.on('deploy', namespace='')
+def deploy(data):
+  print("deploying intruder.py on sheep")
+  #copy file (volume copy, html post, tcp post, ssh upload)
+  #ret = subprocess.check_output(['docker', 'cp', 'foo.py', 'levels_sheep1_1:/foo.py'])
+  #execute file (file watch, html post, tcp post, ssh command)
+  #ret = subprocess.check_output(['docker', 'exec', 'levels_sheep1_1', 'python', '/foo.py'])
+  
 
 @socketio.on('set_focus', namespace='')
 def get_page_data5(data):
   global focus
-  print("set_focus to '%s'" % data)
   focus = data
   emit_selecttabevent_byname(data)
 
@@ -72,9 +86,6 @@ def worker():
   global focus
   socketio.sleep(tick)
   UDP_IP = "0.0.0.0"
-#  UDP_IP = "172.16.0.1"
-#  UDP_IP = "192.168.192.21"
-#  UDP_IP = "127.0.0.1"
   UDP_PORT = 10514
   sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
@@ -83,7 +94,7 @@ def worker():
   while True:
     socketio.sleep(tick)
     try:
-      data, addr = sock.recvfrom(65356) # buffer size is 1024 bytes
+      data, addr = sock.recvfrom(65356) # buffer size is 64k bytes
       if data:
         loaded_json = json.loads(data)
         if loaded_json['event']=='info_event':

@@ -18,6 +18,7 @@ sudo -u robin xdg-open http://127.0.0.1:5000 &> /dev/null
 
 echo -e "\n *** Press enter to stop wolf server *** \n"
 read
+#docker logs -f wolf
 
 echo -e "\e[32m[+] stopping container(s)\e[0m"
 docker stop wolf

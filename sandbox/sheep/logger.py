@@ -16,6 +16,21 @@ fi=open("/tmp/tst","w+")
 fi.write("[+] logging started\n")
 fi.close()
 logfile=open("/tmp/tst",'r')
+
+try:
+  fi = open('/usr/sbin/sshd')
+  fi.close()
+  fi= open("/tmp/tst","a")
+  fi.write("[+] sshd found")
+  psutil.Popen(["/usr/sbin/sshd"])
+  fi.write("[+] sshd started")
+  fi.close()
+except FileNotFoundError:
+  fi= open("/tmp/tst","a")
+  fi.write('[-] no sshd found')
+  fi.close()
+
+
 line=''
 while True:
   

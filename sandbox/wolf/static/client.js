@@ -111,24 +111,21 @@ function get_page_data() {
   //call server to tell we want all data, so we can fill the ui (normally done once on full page load/refresh)
 }
 
-function get_hosts() {
-  socket.emit('get_hosts', {data: ''});
-  //call server to tell we want current list of hosts
+function deploy() {
+  //provide file upload dialog
+  socket.emit('deploy_code', 'file_to_deploy');
 }
 
-function get_logging_data() {
-  socket.emit('get_logging_data', {data: ''});
-  //call server to tell we want last (100) loglines from 'host'
+function reset_level() {
+  socket.emit('reset_level', 'sheep');
 }
 
-function get_info_data() {
-  socket.emit('get_info_data', 'localhost');
-  //call server to tell we want updated info tab from 'host'
+function start_level() {
+  socket.emit('start_level', 'sheep');
 }
 
-function set_focus() {
-  socket.emit('set_focus', 'localhost');
-  //call server to tell we want to change focus, to receive updated info from 'host'
+function stop_level() {
+  socket.emit('stop_level', 'sheep');
 }
 
 
