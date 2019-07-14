@@ -4,7 +4,7 @@ import json
 import time
 from subprocess import PIPE
 
-h='gamemaster'
+h='wolf'
 #h='127.0.0.1'
 #h='192.168.192.21'
 
@@ -21,13 +21,13 @@ try:
   fi = open('/usr/sbin/sshd')
   fi.close()
   fi= open("/tmp/tst","a")
-  fi.write("[+] sshd found")
-  psutil.Popen(["/usr/sbin/sshd"])
-  fi.write("[+] sshd started")
+  fi.write("[+] sshd found\n")
+  psutil.Popen(["/usr/sbin/sshd", "-D"])
+  fi.write("[+] sshd started\n")
   fi.close()
 except FileNotFoundError:
   fi= open("/tmp/tst","a")
-  fi.write('[-] no sshd found')
+  fi.write('[-] no sshd found\n')
   fi.close()
 
 

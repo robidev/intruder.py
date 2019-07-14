@@ -1,10 +1,10 @@
 version: '3.7'
 services:
   sheep1:
-    image: sandbox_entry:latest
+    image: sandbox_entry_sheep:latest
     build:
       context: .
-      dockerfile: Dockerfile.entry
+      dockerfile: Dockerfile.entry_sheep
     networks:
       - network1
     hostname: sheep1
@@ -28,11 +28,11 @@ services:
       - network2
     hostname: sheep3
 
-  gamemaster:
-    image: sandbox_forwarder:latest
+  wolf:
+    image: sandbox_wolf:latest
     build:
       context: .
-      dockerfile: Dockerfile.forwarder
+      dockerfile: Dockerfile.wolf
     networks:
       - network2
       - network1

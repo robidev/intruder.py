@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-#sanic???
 from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO, emit
+from werkzeug import secure_filename
 
 import socket
 import json
 import compose
 import subprocess
+import paramiko
 
 thread = None
 tick = 0.001
@@ -43,6 +44,17 @@ def emit_removehostsevent():
 def index():
   return render_template('index.html', async_mode=socketio.async_mode)
 
+@app.route('/upload')
+def upload_file():
+  return render_template('upload.html')
+	
+@app.route('/uploader', methods = ['GET', 'POST'])
+def uploader():
+  if request.method == 'POST':
+    f = request.files['file']
+    f.save(secure_filename(f.filename))
+    return 'file uploaded successfully'
+
 @socketio.on('get_page_data', namespace='')
 def get_page_data(data):
   print("get_page_data")
@@ -71,8 +83,18 @@ def deploy(data):
   print("deploying intruder.py on sheep")
   #copy file (volume copy, html post, tcp post, ssh upload)
   #ret = subprocess.check_output(['docker', 'cp', 'foo.py', 'levels_sheep1_1:/foo.py'])
+  ssh = paramiko.SSHClient()
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+  ssh.connect('sheep1', username='docker', password='docker')
+
+  sftpClient = ssh.open_sftp()
+  sftpClient.put('foo1.py', "/tmp/foo1.py")
+
   #execute file (file watch, html post, tcp post, ssh command)
   #ret = subprocess.check_output(['docker', 'exec', 'levels_sheep1_1', 'python', '/foo.py'])
+  ssh.exec_command("chmod a+x /tmp/foo1.py")
+  ssh.exec_command("nohup /tmp/foo1.py &")
+  ssh.close()
   
 
 @socketio.on('set_focus', namespace='')

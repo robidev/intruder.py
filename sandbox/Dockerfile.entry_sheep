@@ -7,7 +7,7 @@ ENV USER=docker \
 
 COPY sheep/requirements.txt requirements.txt
 COPY ./sheep .
-COPY entry /
+COPY entry_sheep /
 
 RUN apk add --no-cache --virtual .deps gcc musl-dev linux-headers \
     && apk add --no-cache openssh \

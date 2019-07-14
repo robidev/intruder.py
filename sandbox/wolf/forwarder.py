@@ -2,7 +2,7 @@ import socket
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 10514
-host='wolf'
+host='gamemaster'
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
 sock.bind((UDP_IP, UDP_PORT))
