@@ -21,6 +21,8 @@ read
 #docker logs -f wolf
 
 echo -e "\e[32m[+] stopping container(s)\e[0m"
+
+#docker-compose -f ../sandbox/docker-compose.sheep.yml down
 docker stop gamemaster
 docker rm gamemaster
 

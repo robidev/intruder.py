@@ -5,13 +5,12 @@ ENV FLASK_APP=app.py \
     FLASK_RUN_HOST=0.0.0.0
 
 COPY gamemaster/requirements.txt requirements.txt
+
+RUN apk add make gcc linux-headers python3-dev musl-dev libffi-dev openssl-dev libsodium-dev docker
+RUN pip install -r requirements.txt 
+
 COPY ./gamemaster .
 COPY docker-compose.sheep.yml .
-
-RUN apk add --no-cache --virtual .deps make gcc linux-headers python3-dev musl-dev libffi-dev openssl-dev libsodium-dev \
-    && pip install -r requirements.txt \
-    && apk del --no-cache .deps \
-    && rm -rf /var/cache/apk/*
 
 EXPOSE 5000
 

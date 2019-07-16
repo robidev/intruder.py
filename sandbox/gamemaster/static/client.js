@@ -7,6 +7,29 @@ $(document).ready(function() {
 		showCloseBtn : true,
 	});
 
+	$( '.inputfile' ).each( function()
+	{
+		var $input	 = $( this ),
+			$label	 = $input.next( 'label' ),
+			labelVal = $label.html();
+
+		$input.on( 'change', function( e )
+		{
+			var fileName = '';
+      if( e.target.value )
+				fileName = e.target.value.split( '\\' ).pop();
+			if( fileName )
+				$label.find( 'span' ).html( fileName );
+			else
+				$label.html( labelVal );
+		});
+
+		// Firefox bug fix
+		$input
+		.on( 'focus', function(){ $input.addClass( 'has-focus' ); })
+		.on( 'blur', function(){ $input.removeClass( 'has-focus' ); });
+	});
+
   namespace = '';
   socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
 
@@ -113,7 +136,7 @@ function get_page_data() {
 
 function deploy() {
   //provide file upload dialog
-  socket.emit('deploy_code', 'file_to_deploy');
+  socket.emit('deploy', 'file_to_deploy');
 }
 
 function reset_level() {
@@ -182,10 +205,13 @@ function addNode(host, appearance) {
   var img;
   var ret = 0;
   if(appearance == '1') {
-      img = 'static/img/pc.png';
+      img = 'static/img/pc1.png';
+  }
+  else if(appearance == '2') {
+      img = 'static/img/pc2.png';
   }
   else{
-      img = 'static/img/pc2.png';
+      img = 'static/img/pc3.png';
   }
   try {
       nodes.add({ id: host + "_node", label: host, image: img, shape: 'image', font: '12px Arial white'});
@@ -201,10 +227,13 @@ function updateNode(host, appearance) {
   var img;
   var ret = 0;
   if(appearance == '1') {
-      img = 'static/img/pc.png';
+      img = 'static/img/pc1.png';
+  }
+  else if(appearance == '2') {
+      img = 'static/img/pc2.png';
   }
   else{
-      img = 'static/img/pc2.png';
+      img = 'static/img/pc3.png';
   }
   try {
       nodes.update({

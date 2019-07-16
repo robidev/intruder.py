@@ -28,9 +28,35 @@ if (typeof jQuery == 'undefined') {
       <button class='control' onclick="start_level()">start level</button> 
       <button class='control' onclick="reset_level()">reset level</button> 
       <button class='control' onclick="stop_level()">stop level</button> 
-
-      <button class='control' onclick="deploy()">deploy intruder</button> 
-      <button class='control' onclick="get_page_data()">refresh page</button> 
+      <br><br>
+      <form action="/uploader" id="uploadform" method = "POST" enctype = "multipart/form-data">
+      <script type="text/javascript">
+        $("#uploadform").submit(function(e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+            //var form = $("#uploadform");
+            var form = new FormData($("#uploadform")[0]);
+            $.ajax({
+                  type: "POST",
+                  url: "/uploader",
+                  enctype     : 'multipart/form-data',
+                  processData : false,
+                  contentType: false,
+                  data: form,//.serialize(), // serializes the form's elements.
+                  success: function(data) {
+                      console.log('Submission was successful.');
+                      console.log(data);
+                  },
+                  error: function (data) {
+                      console.log('An error occurred.');
+                      console.log(data);
+                  },
+            });
+        });
+      </script>
+         <input id="file" type = "file" name = "file" accept=".py" class="inputfile"/>
+         <label for="file" class='control' ><span>Choose a file&hellip;</span></label>
+         <input class='control' type = "submit" value="Deploy"/>
+      </form>
     </div>
   </div>
 
@@ -71,6 +97,18 @@ if (typeof jQuery == 'undefined') {
 		</ul>
 		<!-- Tab Headers End --> 
 	</div>
+
+  <div id="real_bg" style="visibility: hidden">
+    <div class="myalert_inner" id="info_inner">
+      <div class="gold-box">
+      <h2 class='h2 teal'>Popup</h2>
+      <pre id="info" style="padding: 20px">
+          This is a popup
+      </pre>
+      </div>
+    </div>
+  </div>
+
 </div>
 </main>
 </body>

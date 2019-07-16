@@ -8,31 +8,34 @@ services:
     networks:
       - network1
     hostname: sheep1
+    container_name: sheep1
 
   sheep2:
     image: sandbox_sheep1:latest
     build:
       context: .
-      dockerfile: Dockerfile.sheep
+      dockerfile: Dockerfile.entry_sheep
     networks:
       - network1
       - network2
     hostname: sheep2
+    container_name: sheep2
 
   sheep3:
     image: sandbox_sheep1:latest
     build:
       context: .
-      dockerfile: Dockerfile.sheep
+      dockerfile: Dockerfile.entry_sheep
     networks:
       - network2
     hostname: sheep3
+    container_name: sheep3
 
-  wolf:
-    image: sandbox_wolf:latest
+  forwarder:
+    image: sandbox_forwarder:latest
     build:
       context: .
-      dockerfile: Dockerfile.wolf
+      dockerfile: Dockerfile.forwarder
     networks:
       - network2
       - network1

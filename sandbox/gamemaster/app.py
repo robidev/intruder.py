@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect, url_for
 from flask_socketio import SocketIO, emit
 from werkzeug import secure_filename
 
@@ -8,10 +8,12 @@ import json
 import compose
 import subprocess
 import paramiko
+import time
 
 thread = None
 tick = 0.001
 focus = ''
+hosts_info = {}
 
 async_mode = None
 
@@ -30,7 +32,6 @@ def emit_selecttabevent_byname(host):
 
 #####################################
 def emit_addhostsevent():
-  emit('add_hosts_event', {'hosts': 'a', 'apearance': '1'})
   emit('add_hosts_event', {'hosts': 'b', 'edges': {'from':'a', 'to': 'b'}, 'apearance': '1'})
 
 def emit_updatehostsevent():
@@ -43,17 +44,20 @@ def emit_removehostsevent():
 @app.route('/')
 def index():
   return render_template('index.html', async_mode=socketio.async_mode)
-
-@app.route('/upload')
-def upload_file():
-  return render_template('upload.html')
 	
-@app.route('/uploader', methods = ['GET', 'POST'])
+@app.route('/uploader', methods = ['POST'])
 def uploader():
   if request.method == 'POST':
-    f = request.files['file']
-    f.save(secure_filename(f.filename))
-    return 'file uploaded successfully'
+    try:
+      f = request.files['file']
+      #f.save(secure_filename(f.filename))
+      f.save(secure_filename('intruder.py'))
+      deploy("")
+      return "Success"
+    except Exception as Err:
+      f = None
+      print(Err)
+      return "Error"#redirect(url_for('index'))
 
 @socketio.on('get_page_data', namespace='')
 def get_page_data(data):
@@ -80,32 +84,34 @@ def reset_level(data):
 
 @socketio.on('deploy', namespace='')
 def deploy(data):
-  print("deploying intruder.py on sheep")
+  print("deploying intruder.py on sheep1")
   #copy file (volume copy, html post, tcp post, ssh upload)
-  #ret = subprocess.check_output(['docker', 'cp', 'foo.py', 'levels_sheep1_1:/foo.py'])
-  ssh = paramiko.SSHClient()
-  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-  ssh.connect('sheep1', username='docker', password='docker')
-
-  sftpClient = ssh.open_sftp()
-  sftpClient.put('foo1.py', "/tmp/foo1.py")
-
+  ret = subprocess.check_output(['docker', 'cp', 'intruder.py', 'sheep1:/intruder.py'])
   #execute file (file watch, html post, tcp post, ssh command)
-  #ret = subprocess.check_output(['docker', 'exec', 'levels_sheep1_1', 'python', '/foo.py'])
-  ssh.exec_command("chmod a+x /tmp/foo1.py")
-  ssh.exec_command("nohup /tmp/foo1.py &")
-  ssh.close()
+  ret = subprocess.check_output(['docker', 'exec', 'sheep1', 'python', '/intruder.py'])
   
 
 @socketio.on('set_focus', namespace='')
-def get_page_data5(data):
+def set_focus(data):
   global focus
+  global hosts_info
   focus = data
+  if focus in hosts_info:
+    if '0' in hosts_info[focus]:
+      socketio.emit('info_event', {'type': '0', 'data': hosts_info[focus]['0']})
+    if '1' in hosts_info[focus]:
+      socketio.emit('info_event', {'type': '1', 'data': hosts_info[focus]['1']})
+    if '2' in hosts_info[focus]:
+      socketio.emit('info_event', {'type': '2', 'data': hosts_info[focus]['2']})
+    if '3' in hosts_info[focus]:
+      socketio.emit('info_event', {'type': '3', 'data': hosts_info[focus]['3']})
+
   emit_selecttabevent_byname(data)
 
 
 def worker():
   global focus
+  global hosts_info
   socketio.sleep(tick)
   UDP_IP = "0.0.0.0"
   UDP_PORT = 10514
@@ -113,6 +119,7 @@ def worker():
                      socket.SOCK_DGRAM) # UDP
   sock.setblocking(False)
   sock.bind((UDP_IP, UDP_PORT))
+  last_time = time.time()
   while True:
     socketio.sleep(tick)
     try:
@@ -120,13 +127,35 @@ def worker():
       if data:
         loaded_json = json.loads(data)
         if loaded_json['event']=='info_event':
-          if loaded_json['data']['host']==focus:
-            socketio.emit('info_event', {'type': loaded_json['data']['type'], 'data': loaded_json['data']['data']})
+          ihost = loaded_json['data']['host']
+          itype = loaded_json['data']['type']
+          idata = loaded_json['data']['data']
+
+          if ihost not in hosts_info:
+            hosts_info[ihost] = {}
+            hosts_info[ihost]['online'] = True
+          
+          if 'online' in hosts_info[ihost] and hosts_info[ihost]['online'] == False:
+            hosts_info[ihost]['online'] = True
+          #  socketio.emit('update_hosts_event', {'hosts': ihost, 'apearance': '1'})
+          
+          hosts_info[ihost]['last'] = time.time()
+          hosts_info[ihost][itype] = idata
+          
+          socketio.emit('add_hosts_event', {'hosts': ihost, 'apearance': '1'})
+          if ihost==focus:
+            socketio.emit('info_event', {'type': itype, 'data': idata})
         else:
           socketio.emit(loaded_json['event'], loaded_json['data'])
     except socket.error as msg:
       pass
-
+    cur_time = time.time()
+    if cur_time > (last_time + 1):                                                              #every second
+      last_time = cur_time
+      for host in hosts_info:                                                                   #check for every host in list
+        if (time.time() - hosts_info[host]['last']) > 5 and hosts_info[host]['online'] == True: #if data is stale (+ 5 sec)
+          hosts_info[host]['online'] = False
+          socketio.emit('update_hosts_event', {'hosts': host, 'apearance': '3'})                #grey out icon
 
 @socketio.on('connect', namespace='')
 def test_connect():

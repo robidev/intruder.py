@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  sheep1:
+    image: alpine
+    stdin_open: true
+    tty: true
+    privileged: true
+    networks:
+      - network1
+    hostname: sheep1
+
+  sheep2:
+    image: alpine 
+    stdin_open: true
+    tty: true
+    privileged: true
+    networks:
+      - network1
+      - network2
+    hostname: sheep2
+
+  sheep3:
+    image: alpine
+    stdin_open: true
+    tty: true
+    privileged: true
+    networks:
+      - network2
+    hostname: sheep3
+
+networks:
+  network1:
+    internal: true
+  network2:
+    internal: true

@@ -4,9 +4,8 @@ import json
 import time
 from subprocess import PIPE
 
-h='wolf'
+h='forwarder'
 #h='127.0.0.1'
-#h='192.168.192.21'
 
 p=10514
 hs=socket.gethostname()
@@ -79,6 +78,3 @@ while True:
       line = ''
   
   time.sleep(1)
-  fi= open("/tmp/tst","a")
-  fi.write("%s:tick\n" % hs)
-  fi.close()
