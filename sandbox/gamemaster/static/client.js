@@ -121,6 +121,13 @@ $(document).ready(function() {
     removeNode(data['hosts']);
   });
 
+  socket.on('solved_event', function (data) {
+    //event gets called from server when the level has been solved;
+    $('#info')[0].innerHTML = data['win_msg'];
+    var popup = $('#real_bg')[0]
+    popup.style.visibility = "visible";
+  });
+
 });
 
 /********************************************************/

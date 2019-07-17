@@ -31,14 +31,8 @@ def emit_selecttabevent_byname(host):
   emit('select_tab_event', {'host_name': host})
 
 #####################################
-def emit_addhostsevent():
-  emit('add_hosts_event', {'hosts': 'b', 'edges': {'from':'a', 'to': 'b'}, 'apearance': '1'})
-
-def emit_updatehostsevent():
-  emit('update_hosts_event', {'hosts': 'a', 'apearance': '2'})
-
-def emit_removehostsevent():
-  emit('remove_hosts_event', {'hosts': 'a'})
+def emit_removehostsevent(host):
+  emit('remove_hosts_event', {'hosts': 'host'})
 ######################################
 
 @app.route('/')
@@ -108,6 +102,41 @@ def set_focus(data):
 
   emit_selecttabevent_byname(data)
 
+def process_info_event(loaded_json):
+  global focus
+  global hosts_info
+  ihost = loaded_json['data']['host']
+  itype = loaded_json['data']['type']
+  idata = loaded_json['data']['data']
+
+  if ihost not in hosts_info:
+    hosts_info[ihost] = {}
+    hosts_info[ihost]['online'] = True
+    hosts_info[ihost]['compromised'] = False
+    socketio.emit('add_hosts_event', {'hosts': ihost, 'apearance': '1'})
+
+  if hosts_info[ihost]['online'] == False:
+    hosts_info[ihost]['online'] = True
+
+  if hosts_info[ihost]['compromised'] == False:
+    socketio.emit('update_hosts_event', {'hosts': ihost, 'apearance': '1'})
+  else:
+    socketio.emit('update_hosts_event', {'hosts': ihost, 'apearance': '2'})
+
+  hosts_info[ihost]['last'] = time.time()
+  hosts_info[ihost][itype] = idata
+  if ihost==focus:
+    socketio.emit('info_event', {'type': itype, 'data': idata})
+
+def validate_flag(ihost,flag):
+  #todo: find a way for custom level definitions: host, flag, win_msg, maybe from YML file?
+  host = 'sheep3'
+  win_flag = '0123456789'
+  win_msg = 'Congratulations. The level has been solved!'
+  print("checking")
+  if ihost == host and flag == win_flag:
+    socketio.emit('solved_event', {'win_msg': win_msg})
+    print("solved!")
 
 def worker():
   global focus
@@ -127,28 +156,27 @@ def worker():
       if data:
         loaded_json = json.loads(data)
         if loaded_json['event']=='info_event':
-          ihost = loaded_json['data']['host']
-          itype = loaded_json['data']['type']
-          idata = loaded_json['data']['data']
+          process_info_event(loaded_json)
 
-          if ihost not in hosts_info:
-            hosts_info[ihost] = {}
-            hosts_info[ihost]['online'] = True
-          
-          if 'online' in hosts_info[ihost] and hosts_info[ihost]['online'] == False:
-            hosts_info[ihost]['online'] = True
-          #  socketio.emit('update_hosts_event', {'hosts': ihost, 'apearance': '1'})
-          
-          hosts_info[ihost]['last'] = time.time()
-          hosts_info[ihost][itype] = idata
-          
-          socketio.emit('add_hosts_event', {'hosts': ihost, 'apearance': '1'})
-          if ihost==focus:
-            socketio.emit('info_event', {'type': itype, 'data': idata})
+        elif loaded_json['event']=='intruder_event':
+          ihost = loaded_json['data']['host']
+          hosts_info[ihost]['compromised'] = True
+
+        elif loaded_json['event']=='flag_event':
+          ihost = loaded_json['data']['host']
+          flag = loaded_json['data']['flag']
+          validate_flag(ihost,flag)
+
+        elif loaded_json['event']=='connect_event':
+          ihost = loaded_json['data']['host']
+          dest = loaded_json['data']['dest']
+          socketio.emit('update_hosts_event', {'hosts': ihost, 'edges': {'from':ihost, 'to': dest }})
         else:
           socketio.emit(loaded_json['event'], loaded_json['data'])
     except socket.error as msg:
       pass
+    
+    #timeout info event
     cur_time = time.time()
     if cur_time > (last_time + 1):                                                              #every second
       last_time = cur_time
@@ -156,6 +184,7 @@ def worker():
         if (time.time() - hosts_info[host]['last']) > 5 and hosts_info[host]['online'] == True: #if data is stale (+ 5 sec)
           hosts_info[host]['online'] = False
           socketio.emit('update_hosts_event', {'hosts': host, 'apearance': '3'})                #grey out icon
+
 
 @socketio.on('connect', namespace='')
 def test_connect():

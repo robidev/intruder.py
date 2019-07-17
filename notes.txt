@@ -1,14 +1,10 @@
 goal for virus is to propagate, extract a file, and send it to an ip.
-
-TODO level selector, will spin up machines and network
-
-webui:(flask)
- TODO upload to container via ssh(only 1 exposed to host) (pyinstaller)
- TODO issue get to webui/api with file contents
   
-javascript: generate tabs, based on pushing of data, TODO remembering state
- TODO display pc-color(blue/red) based on log-message, gray if stale data
- TODO add connecting-lines based on connections(logging/subnet/netstat/scan?)
+javascript: generate tabs, based on pushing of data, 
+  TODO write init.py script
+  TODO send signal to forwarder re-init loggin (tail and such)
+
+TODO level selector+artwork, will spin up machines and network
 
 install:(windows/mac/linux)
 
