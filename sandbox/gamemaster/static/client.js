@@ -128,6 +128,10 @@ $(document).ready(function() {
     popup.style.visibility = "visible";
   });
 
+  socket.on('page_reload', function (data) {
+    location.reload();
+  });
+
 });
 
 /********************************************************/

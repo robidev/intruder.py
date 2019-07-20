@@ -59,7 +59,8 @@ def uploader():
 
 @socketio.on('get_page_data', namespace='')
 def get_page_data(data):
-  print("get_page_data")
+  #print("get_page_data")
+  emit('page_reload', {'data': ""})
 
 @socketio.on('start_level', namespace='')
 def start_level(data):
@@ -76,10 +77,9 @@ def stop_level(data):
 @socketio.on('reset_level', namespace='')
 def reset_level(data):
   print("resetting level")
-
   stop_level(data)
-  get_page_data(data)
   start_level(data)
+  get_page_data(data)
 
 @socketio.on('deploy', namespace='')
 def deploy(data):
@@ -164,7 +164,7 @@ def worker():
 
     if reset_log == True:
       print("resetting logs")
-      socketio.sleep(2)
+      socketio.sleep(1)
       try:
         sock.sendto(b"reset_log\n",(forwarder,REFRESH_HOSTS_PORT))
       except socket.error as msg:
