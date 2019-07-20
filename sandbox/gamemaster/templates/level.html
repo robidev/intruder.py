@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>Intruder</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="static/css/layout.css" rel="stylesheet" type="text/css"></link>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+if (typeof jQuery == 'undefined') {
+    document.write(unescape("%3Cscript type='text/javascript' src='static/lib/jquery.min.js'%3E%3C/script%3E"));
+}
+
+$(document).ready(function() {
+  $.getJSON(
+    '/get_levels',
+    function(data) {                               
+      // Add new items
+      $.each(data, function(key, val) {
+        var option_item = '<option value="' + key + '">' + key + '</option>'
+        $('#level').append(option_item);
+      });
+    }
+  );
+});
+</script>
+<script type="text/javascript" src="static/lib/socket.io.js"></script>
+
+</head>
+<body>
+<main id='main_content'>
+<div class='wrap'>
+  <div class="column leftside">
+    <h2 class='h2 magenta'>Level select</h2>
+    <div class='content'>
+      <form action="/" method="GET">
+          <input class='control' type="submit" value='start'>
+          <select class='control' id="level" name="level" size="20"></select>
+      </form>
+    </div>
+  </div>
+
+</div>
+</main>
+</body>
+</html>
+

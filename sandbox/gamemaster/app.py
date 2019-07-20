@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, render_template, session, request, redirect, url_for
+from flask import Flask, render_template, session, request, redirect, url_for, jsonify
 from flask_socketio import SocketIO, emit
 from werkzeug import secure_filename
 
@@ -16,6 +16,11 @@ focus = ''
 hosts_info = {}
 reset_log = False
 
+level = ""
+levels = {
+    'one':'docker-compose.sheep.yml','two':'docker-compose.sheep.yml'
+}
+
 async_mode = None
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -31,48 +36,47 @@ def emit_selecttabevent_byindex(index):
 def emit_selecttabevent_byname(host):
   emit('select_tab_event', {'host_name': host})
 
-#####################################
-def emit_removehostsevent(host):
-  emit('remove_hosts_event', {'hosts': 'host'})
-######################################
-
-@app.route('/')
+@app.route('/', methods = ['GET'])
 def index():
-  global reset_log
-  reset_log = True
+  if request.method == 'GET':
+    temp = request.args.get('level')
+    if temp in levels:
+      global level
+      global reset_log
+      level = temp
+      reset_log = True
+      return render_template('index.html', async_mode=socketio.async_mode)
+  return render_template('level.html', async_mode=socketio.async_mode)
 
-  return render_template('index.html', async_mode=socketio.async_mode)
-	
 @app.route('/uploader', methods = ['POST'])
 def uploader():
   if request.method == 'POST':
     try:
       f = request.files['file']
-      #f.save(secure_filename(f.filename))
       f.save(secure_filename('intruder.py'))
       deploy("")
       return "Success"
     except Exception as Err:
       f = None
-      #print(Err)
       return "Error"#redirect(url_for('index'))
+
+@app.route('/get_levels')
+def get_levels():
+  return jsonify(levels)
 
 @socketio.on('get_page_data', namespace='')
 def get_page_data(data):
-  #print("get_page_data")
   emit('page_reload', {'data': ""})
 
 @socketio.on('start_level', namespace='')
 def start_level(data):
   print("starting level")
-  ret = subprocess.check_output(['docker-compose', '-f', '/levels/docker-compose.sheep.yml', 'up', '-d'])
-  #print(ret)
+  ret = subprocess.check_output(['docker-compose', '-f', '/levels/' + levels[level], 'up', '-d'])
 
 @socketio.on('stop_level', namespace='')
 def stop_level(data):
   print("stopping level")
-  ret = subprocess.check_output(['docker-compose', '-f', '/levels/docker-compose.sheep.yml', 'down'])
-  #print(ret)
+  ret = subprocess.check_output(['docker-compose', '-f', '/levels/' + levels[level], 'down'])
 
 @socketio.on('reset_level', namespace='')
 def reset_level(data):
