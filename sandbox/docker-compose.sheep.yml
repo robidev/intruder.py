@@ -1,20 +1,20 @@
 version: '3.7'
 services:
   sheep1:
-    image: sandbox_entry_sheep:latest
+    image: sandbox_sheep:latest
     build:
       context: .
-      dockerfile: Dockerfile.entry_sheep
+      dockerfile: Dockerfile.sheep
     networks:
       - network1
     hostname: sheep1
     container_name: sheep1
 
   sheep2:
-    image: sandbox_sheep1:latest
+    image: sandbox_sheep:latest
     build:
       context: .
-      dockerfile: Dockerfile.entry_sheep
+      dockerfile: Dockerfile.sheep
     networks:
       - network1
       - network2
@@ -22,10 +22,10 @@ services:
     container_name: sheep2
 
   sheep3:
-    image: sandbox_sheep1:latest
+    image: sandbox_sheep:latest
     build:
       context: .
-      dockerfile: Dockerfile.entry_sheep
+      dockerfile: Dockerfile.sheep
     networks:
       - network2
     hostname: sheep3

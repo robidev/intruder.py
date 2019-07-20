@@ -14,6 +14,7 @@ thread = None
 tick = 0.001
 focus = ''
 hosts_info = {}
+reset_log = False
 
 async_mode = None
 
@@ -37,6 +38,9 @@ def emit_removehostsevent(host):
 
 @app.route('/')
 def index():
+  global reset_log
+  reset_log = True
+
   return render_template('index.html', async_mode=socketio.async_mode)
 	
 @app.route('/uploader', methods = ['POST'])
@@ -50,7 +54,7 @@ def uploader():
       return "Success"
     except Exception as Err:
       f = None
-      print(Err)
+      #print(Err)
       return "Error"#redirect(url_for('index'))
 
 @socketio.on('get_page_data', namespace='')
@@ -61,17 +65,18 @@ def get_page_data(data):
 def start_level(data):
   print("starting level")
   ret = subprocess.check_output(['docker-compose', '-f', '/levels/docker-compose.sheep.yml', 'up', '-d'])
-  print(ret)
+  #print(ret)
 
 @socketio.on('stop_level', namespace='')
 def stop_level(data):
   print("stopping level")
   ret = subprocess.check_output(['docker-compose', '-f', '/levels/docker-compose.sheep.yml', 'down'])
-  print(ret)
+  #print(ret)
 
 @socketio.on('reset_level', namespace='')
 def reset_level(data):
   print("resetting level")
+
   stop_level(data)
   get_page_data(data)
   start_level(data)
@@ -141,16 +146,33 @@ def validate_flag(ihost,flag):
 def worker():
   global focus
   global hosts_info
+  global reset_log
   socketio.sleep(tick)
   UDP_IP = "0.0.0.0"
   UDP_PORT = 10514
+  forwarder = "forwarder"
+  REFRESH_HOSTS_PORT = 10516
+
   sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
   sock.setblocking(False)
   sock.bind((UDP_IP, UDP_PORT))
+
   last_time = time.time()
   while True:
     socketio.sleep(tick)
+
+    if reset_log == True:
+      print("resetting logs")
+      socketio.sleep(2)
+      try:
+        sock.sendto(b"reset_log\n",(forwarder,REFRESH_HOSTS_PORT))
+      except socket.error as msg:
+        pass
+      focus = ''
+      hosts_info = {}
+      reset_log = False
+
     try:
       data, addr = sock.recvfrom(65356) # buffer size is 64k bytes
       if data:

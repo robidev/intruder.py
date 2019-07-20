@@ -228,6 +228,11 @@ div.tabcontents {
   background-color: rgba(255, 0, 255, 0.692);
 }
 
+.control:active {
+  transition: 0s;
+  background-color: #F1F;
+}
+
 div#real_bg {
     position: fixed;
     top: 0px;

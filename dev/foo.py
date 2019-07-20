@@ -15,7 +15,7 @@ fi.write("[+] sending connect event\n")
 s.sendto(str.encode(json.dumps({'event':'connect_event', 'data':{'host':hs,'dest':'sheep2'}})),(h,p))
 s.sendto(str.encode(json.dumps({'event':'connect_event', 'data':{'host':'sheep3','dest':'sheep2'}})),(h,p))
 
-s.sendto(str.encode(json.dumps({'event':'flag_event', 'data':{'host':'sheep3','flag':'0123456789'}})),(h,p))
+#s.sendto(str.encode(json.dumps({'event':'flag_event', 'data':{'host':'sheep3','flag':'0123456789'}})),(h,p))
 
 fi.write("[+] payload done\n")
 fi.close()
