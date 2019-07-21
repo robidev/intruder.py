@@ -10,40 +10,37 @@ import compose
 import subprocess
 import paramiko
 import time
-
 import logging
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+import yaml
 
 thread = None
 tick = 0.001
 focus = ''
 hosts_info = {}
 reset_log = False
-
+async_mode = None
+gamemaster = None
+level_dict = {}
 level = ""
 levels = {
     'one':'docker-compose.sheep.yml','two':'docker-compose.sheep.yml'
 }
 
-async_mode = None
-
-client = docker.from_env()
-gamemaster = client.containers.get('gamemaster')
-
+#webserver
 app = Flask(__name__, template_folder='templates', static_folder='static')
 socketio = SocketIO(app, async_mode=async_mode)
+#logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+#docker
+try:
+  client = docker.from_env()
+  gamemaster = client.containers.get('gamemaster')
+except:
+  print("could not connect to docker daemon, and retrieve gamemaster container")
 
 
-def emit_infoevent(type, data):
-  emit('info_event', {'type': type, 'data': data})
-
-def emit_selecttabevent_byindex(index):
-  emit('select_tab_event', {'host_index': index})
-
-def emit_selecttabevent_byname(host):
-  emit('select_tab_event', {'host_name': host})
-
+#http calls
 @app.route('/', methods = ['GET'])
 def index():
   if request.method == 'GET':
@@ -51,10 +48,19 @@ def index():
     if temp in levels:
       global level
       global reset_log
+      global level_dict
       level = temp
       reset_log = True
+
+      with open('/levels/' + levels[level], 'r') as stream:
+        try:
+          level_dict = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+          print(exc)
+      
       return render_template('index.html', async_mode=socketio.async_mode)
   return render_template('level.html', async_mode=socketio.async_mode)
+
 
 @app.route('/uploader', methods = ['POST'])
 def uploader():
@@ -66,12 +72,15 @@ def uploader():
       return "Success"
     except Exception as Err:
       f = None
-      return "Error"#redirect(url_for('index'))
+      return "Error"
+
 
 @app.route('/get_levels')
 def get_levels():
   return jsonify(levels)
 
+
+# Socket events
 @socketio.on('get_page_data', namespace='')
 def get_page_data(data):
   emit('page_reload', {'data': ""})
@@ -101,7 +110,6 @@ def deploy(data):
   #execute file (file watch, html post, tcp post, ssh command)
   ret = subprocess.check_output(['docker', 'exec', 'sheep1', 'python', '/intruder.py'])
   
-
 @socketio.on('set_focus', namespace='')
 def set_focus(data):
   global focus
@@ -116,9 +124,15 @@ def set_focus(data):
       socketio.emit('info_event', {'type': '2', 'data': hosts_info[focus]['2']})
     if '3' in hosts_info[focus]:
       socketio.emit('info_event', {'type': '3', 'data': hosts_info[focus]['3']})
+  emit('select_tab_event', {'host_name': focus})
 
-  emit_selecttabevent_byname(data)
+@socketio.on('connect', namespace='')
+def test_connect():
+  global thread
+  if thread is None:
+    thread = socketio.start_background_task(target=worker)
 
+#worker subroutines
 def process_info_event(loaded_json):
   global focus
   global hosts_info
@@ -146,15 +160,18 @@ def process_info_event(loaded_json):
     socketio.emit('info_event', {'type': itype, 'data': idata})
 
 def validate_flag(ihost,flag):
-  #todo: find a way for custom level definitions: host, flag, win_msg, maybe from YML file?
-  host = 'sheep3'
-  win_flag = '0123456789'
-  win_msg = 'Congratulations. The level has been solved!'
+  global level_dict
+  host = level_dict['x-host']
+  win_flag = level_dict['x-challenge']
+  win_msg = level_dict['x-win_message']
   print("checking")
   if ihost == host and flag == win_flag:
     socketio.emit('solved_event', {'win_msg': win_msg})
     print("solved!")
+    level = "" # go back to level selector
+    level_dict = {}
 
+#background thread
 def worker():
   global focus
   global hosts_info
@@ -173,25 +190,26 @@ def worker():
 
   last_time = time.time()
 
-  logline = gamemaster.logs(until=int(last_time))
-  if logline != "":
-    logline_utf = logline.decode('utf-8')
-    socketio.emit('log_event', {'host':'localhost','data':logline_utf,'clear':1})
+  if gamemaster != None:
+    logline = gamemaster.logs(until=int(last_time))
+    if logline != "":
+      logline_utf = logline.decode('utf-8')
+      socketio.emit('log_event', {'host':'localhost','data':logline_utf,'clear':1})
 
   while True:
     socketio.sleep(tick)
-
+    #reset the client
     if reset_log == True:
-      print("resetting logs")
-      socketio.sleep(1)
+      socketio.sleep(0.5)
+      focus = ''
+      hosts_info = {}
+      reset_log = False
       try:
         sock.sendto(b"reset_log\n",(forwarder,REFRESH_HOSTS_PORT))
       except socket.error as msg:
         pass
-      focus = ''
-      hosts_info = {}
-      reset_log = False
-
+      socketio.sleep(0.5)
+    #parse info events
     try:
       data, addr = sock.recvfrom(65356) # buffer size is 64k bytes
       if data:
@@ -217,26 +235,23 @@ def worker():
     except socket.error as msg:
       pass
     
-    
     #timeout info event
     cur_time = time.time()
     if cur_time > (last_time + 1):                                                              #every second
-      logline = gamemaster.logs(since=int(last_time), until=int(cur_time))
+      #print server logging
+      if gamemaster != None:
+        logline = gamemaster.logs(since=int(last_time), until=int(cur_time))
+        if logline != "":
+          logline_utf = logline.decode('utf-8')
+          socketio.emit('log_event', {'host':'localhost','data':logline_utf,'clear':0})
+      #assign new last time
       last_time = cur_time
-      if logline != "":
-        logline_utf = logline.decode('utf-8')
-        socketio.emit('log_event', {'host':'localhost','data':logline_utf,'clear':0})
+      #check host timeout
       for host in hosts_info:                                                                   #check for every host in list
         if (time.time() - hosts_info[host]['last']) > 5 and hosts_info[host]['online'] == True: #if data is stale (+ 5 sec)
           hosts_info[host]['online'] = False
           socketio.emit('update_hosts_event', {'hosts': host, 'apearance': '3'})                #grey out icon
 
-
-@socketio.on('connect', namespace='')
-def test_connect():
-  global thread
-  if thread is None:
-    thread = socketio.start_background_task(target=worker)
 
 if __name__ == '__main__':
   socketio.run(app)

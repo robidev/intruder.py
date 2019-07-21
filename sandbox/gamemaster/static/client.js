@@ -179,7 +179,7 @@ function addNewStaticTab(host)
   $.addDynaTab({
     tabID : 'hostlogtab',
     type : 'html',
-    html : '<pre>[+] loggin started</pre>',
+    html : '<pre>[+] logging started</pre>',
     tabTitle : host
   });
 
