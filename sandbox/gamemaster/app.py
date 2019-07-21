@@ -3,12 +3,17 @@ from flask import Flask, render_template, session, request, redirect, url_for, j
 from flask_socketio import SocketIO, emit
 from werkzeug import secure_filename
 
+import docker
 import socket
 import json
 import compose
 import subprocess
 import paramiko
 import time
+
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 thread = None
 tick = 0.001
@@ -22,6 +27,9 @@ levels = {
 }
 
 async_mode = None
+
+client = docker.from_env()
+gamemaster = client.containers.get('gamemaster')
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 socketio = SocketIO(app, async_mode=async_mode)
@@ -151,6 +159,7 @@ def worker():
   global focus
   global hosts_info
   global reset_log
+  global gamemaster
   socketio.sleep(tick)
   UDP_IP = "0.0.0.0"
   UDP_PORT = 10514
@@ -163,6 +172,12 @@ def worker():
   sock.bind((UDP_IP, UDP_PORT))
 
   last_time = time.time()
+
+  logline = gamemaster.logs(until=int(last_time))
+  if logline != "":
+    logline_utf = logline.decode('utf-8')
+    socketio.emit('log_event', {'host':'localhost','data':logline_utf,'clear':1})
+
   while True:
     socketio.sleep(tick)
 
@@ -202,10 +217,15 @@ def worker():
     except socket.error as msg:
       pass
     
+    
     #timeout info event
     cur_time = time.time()
     if cur_time > (last_time + 1):                                                              #every second
+      logline = gamemaster.logs(since=int(last_time), until=int(cur_time))
       last_time = cur_time
+      if logline != "":
+        logline_utf = logline.decode('utf-8')
+        socketio.emit('log_event', {'host':'localhost','data':logline_utf,'clear':0})
       for host in hosts_info:                                                                   #check for every host in list
         if (time.time() - hosts_info[host]['last']) > 5 and hosts_info[host]['online'] == True: #if data is stale (+ 5 sec)
           hosts_info[host]['online'] = False
@@ -219,5 +239,5 @@ def test_connect():
     thread = socketio.start_background_task(target=worker)
 
 if __name__ == '__main__':
-  socketio.run(app, debug=True)
+  socketio.run(app)
 

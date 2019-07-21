@@ -6,6 +6,8 @@ $(document).ready(function() {
 		tabBodyID : "hostlogbody",
 		showCloseBtn : true,
 	});
+  var tabje = $("#localhost_tab")[0];
+  tabje.children[0].classList.remove("closeable");
 
 	$( '.inputfile' ).each( function()
 	{
@@ -177,7 +179,7 @@ function addNewStaticTab(host)
   $.addDynaTab({
     tabID : 'hostlogtab',
     type : 'html',
-    html : '...',
+    html : '<pre>[+] loggin started</pre>',
     tabTitle : host
   });
 

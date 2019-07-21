@@ -14,7 +14,7 @@ docker run -dit -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock -v $(p
 
 
 echo -e "\e[32m[+] starting browser\e[0m"
-sudo -u robin xdg-open http://127.0.0.1:5000 &> /dev/null
+sudo -u robin xdg-open http://127.0.0.1:5000/?level=one &> /dev/null
 
 echo -e "\n *** Press enter to stop gamemaster server *** \n"
 read
