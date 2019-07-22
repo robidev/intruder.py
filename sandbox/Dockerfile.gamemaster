@@ -13,7 +13,7 @@ RUN    apk add --no-cache --virtual .deps make gcc linux-headers python3-dev mus
     && rm -rf /var/cache/apk/*
 
 COPY ./gamemaster .
-COPY docker-compose.sheep.yml .
+COPY levels/docker-compose.sheep.yml .
 
 EXPOSE 5000
 

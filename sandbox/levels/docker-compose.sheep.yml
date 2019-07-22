@@ -1,9 +1,9 @@
 version: '3.7'
-x-level: level1
+x-level: level 1
 x-host: sheep3
 x-challenge: 0123456789
 x-win_message: 'Congratulations! The level has been solved'
-x-coverart: level1.png
+x-coverart: level1.jpg
 
 services:
   sheep1:

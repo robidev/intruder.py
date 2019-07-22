@@ -1,0 +1,56 @@
+version: '3.7'
+x-level: level 2
+x-host: sheep3
+x-challenge: 0123456789
+x-win_message: 'Congratulations! The level has been solved'
+x-coverart: level2.jpg
+
+services:
+  sheep1:
+    image: sandbox_sheep:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.sheep
+    networks:
+      - network1
+    hostname: sheep1
+    container_name: sheep1
+
+  sheep2:
+    image: sandbox_sheep:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.sheep
+    networks:
+      - network1
+      - network2
+    hostname: sheep2
+    container_name: sheep2
+
+  sheep3:
+    image: sandbox_sheep:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.sheep
+    networks:
+      - network2
+    hostname: sheep3
+    container_name: sheep3
+
+  forwarder:
+    image: sandbox_forwarder:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.forwarder
+    networks:
+      - network2
+      - network1
+      - network_master
+
+networks:
+  network1:
+    internal: true
+  network2:
+    internal: true
+  network_master:
+    external: true

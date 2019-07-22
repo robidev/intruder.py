@@ -2,7 +2,7 @@ goal for virus is to propagate, extract a file, and send it to an ip.
   
 TODO check all send threats for case that there is no receiver to resolve, this will cause an exception
 TODO make host_info related to session
-TODO level selector+artwork, will spin up machines and network: retro city scape, retro hacker theme, bulletin-board, scada, just pallette
+TODO artwork, will spin up machines and network: retro city scape, retro hacker theme, bulletin-board, scada, just pallette
 
 install:(windows/mac/linux)
 

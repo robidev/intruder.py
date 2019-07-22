@@ -12,6 +12,9 @@ import paramiko
 import time
 import logging
 import yaml
+import os
+
+LEVEL_PATH = "../levels/"
 
 thread = None
 tick = 0.001
@@ -22,9 +25,7 @@ async_mode = None
 gamemaster = None
 level_dict = {}
 level = ""
-levels = {
-    'one':'docker-compose.sheep.yml','two':'docker-compose.sheep.yml'
-}
+levels = {} # 'one':'docker-compose.sheep.yml','two':'docker-compose.sheep.yml'}
 
 #webserver
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -52,7 +53,7 @@ def index():
       level = temp
       reset_log = True
 
-      with open('/levels/' + levels[level], 'r') as stream:
+      with open(LEVEL_PATH + levels[level], 'r') as stream:
         try:
           level_dict = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
@@ -77,6 +78,16 @@ def uploader():
 
 @app.route('/get_levels')
 def get_levels():
+  global levels
+  for file in os.listdir(LEVEL_PATH):
+    if file.endswith(".yml"):
+      with open(LEVEL_PATH + file, 'r') as stream:
+        try:
+          l_dict = yaml.safe_load(stream)
+          levelname = l_dict['x-level']
+          levels[levelname] = file
+        except yaml.YAMLError as exc:
+          print(exc)
   return jsonify(levels)
 
 
@@ -88,12 +99,12 @@ def get_page_data(data):
 @socketio.on('start_level', namespace='')
 def start_level(data):
   print("starting level")
-  ret = subprocess.check_output(['docker-compose', '-f', '/levels/' + levels[level], 'up', '-d'])
+  ret = subprocess.check_output(['docker-compose', '-f', LEVEL_PATH + levels[level], 'up', '-d'])
 
 @socketio.on('stop_level', namespace='')
 def stop_level(data):
   print("stopping level")
-  ret = subprocess.check_output(['docker-compose', '-f', '/levels/' + levels[level], 'down'])
+  ret = subprocess.check_output(['docker-compose', '-f', LEVEL_PATH + levels[level], 'down'])
 
 @socketio.on('reset_level', namespace='')
 def reset_level(data):

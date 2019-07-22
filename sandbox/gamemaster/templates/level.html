@@ -23,6 +23,12 @@ $(document).ready(function() {
     }
   );
 });
+
+function change_preview() {
+  var im = "static/" + $('#level')[0].value + ".jpg";
+  //var level_p = 
+  $('#level_preview').attr("src", im );
+}
 </script>
 <script type="text/javascript" src="static/lib/socket.io.js"></script>
 
@@ -30,13 +36,18 @@ $(document).ready(function() {
 <body>
 <main id='main_content'>
 <div class='wrap'>
-  <div class="column leftside">
+  <div class="column" style="border: 1px solid rgba(255, 0, 255, 0.692);  display: inline; grid-column: 1; grid-row-start: 1;	grid-row-end: 2;">
     <h2 class='h2 magenta'>Level select</h2>
     <div class='content'>
       <form action="/" method="GET">
           <input class='control' type="submit" value='start'>
-          <select class='control' id="level" name="level" size="20"></select>
+          <select class='levellist' id="level" name="level" size="7" onchange="change_preview()"></select>
       </form>
+    </div>
+  </div>
+  <div class="column" style="width: 820px; border: 1px solid rgba(255, 0, 255, 0.692); display: inline; grid-column-start: 2;	grid-column-end: 3; grid-row-start: 1;	grid-row-end: 2;"">
+	  <div class='content' style="">
+      <img id="level_preview" src="static/logo.jpg" style="width: 800px;">
     </div>
   </div>
 
