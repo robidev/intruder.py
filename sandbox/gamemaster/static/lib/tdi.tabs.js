@@ -34,7 +34,7 @@
 					}
 					else
 					{
-						alert('You have debug enabled in settings. It is only supported in Firefox and Chrome now.');
+						//alert('You have debug enabled in settings. It is only supported in Firefox and Chrome now.');
 					}
 				}
 			};
@@ -64,14 +64,14 @@
 					var canDelete = false;
 					var ahref = null;
 					//check if the tab can be deleted
-					if(settings.confirmDelete)
+					/*if(settings.confirmDelete)
 					{
 						if(confirm(settings.confirmMessage))
 						{
 							canDelete = true;
 						}
 					}
-					else
+					else*/
 					{
 						canDelete = true;
 					}
@@ -276,7 +276,7 @@
 							$(a).find("span").remove();
 							$.fn.addCloseBtn(a);
 						}).fail(function(){
-							alert('Failed to load the ajax page');
+							$.fn.debug('Failed to load the ajax page');
 							$(div).remove();
 							$(li).remove();
 						});
