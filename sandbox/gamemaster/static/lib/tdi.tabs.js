@@ -64,14 +64,14 @@
 					var canDelete = false;
 					var ahref = null;
 					//check if the tab can be deleted
-					/*if(settings.confirmDelete)
+					if(settings.confirmDelete)
 					{
 						if(confirm(settings.confirmMessage))
 						{
 							canDelete = true;
 						}
 					}
-					else*/
+					else
 					{
 						canDelete = true;
 					}
